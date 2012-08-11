@@ -100,12 +100,6 @@ var fs = require('fs'),
    
             },
 
-            pop: function(i){
-               var item = this.load.indexOf(i);
-               delete this.load[i];
-               this.load = _su.normArray(this.load);
-            },
-
             destroy: function(){
                 _su.explode(this.load);
                 this.isAlive = false;
