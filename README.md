@@ -10,7 +10,7 @@
 					.find("file")
 						.find("blah")
 							.searchFiles(null,".js") :
-		 	which gets your all .js files with litte effort and then read all of them
+		 	which gets you all .js files with litte effort and then read all of them
 		    in an instant with no repetition,just simple
 		
 		file.read(); file.write(data);
