@@ -80,21 +80,25 @@ var fs = require('fs'),
                return map;
             },
 
-            _reader: function(d,store){
-                var d = fs.readFile(d,function(e){
-                   store.push(e);
-                });
-            },
-
             read: function(){
                var data = [];
                _su.onEach(this.load,function(e,i,b){
-                  this._reader(e,data);
+                     data.push(fs.readFileSync(e).toString());
                },this);
                return data;
             },
 
-            write: function(){},
+            write: function(data,name){
+               _su.onEach(this.load,function(e,i,b){
+                     if(name && i === name){
+                        fs.appendFileSync(e,data);
+                        return;
+                     }
+                     fs.appendFileSync(e,data);
+                     return;
+               },this);
+   
+            },
 
             pop: function(i){
                var item = this.load.indexOf(i);
