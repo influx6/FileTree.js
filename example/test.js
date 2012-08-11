@@ -19,6 +19,11 @@ tree.root("~").searchFiles(".zshrc");
 
 tree.root("~").find("Projects").find("petprojects").find("stub").searchFiles(null,".js",function(f){
       var file = FileTree.FileFactory.spawn(f);
+      //once u are done using the file ,destroy it to cleanup
+      //things,FileFactory only allows 10 spawns to keep performance top
+      //shape,once a file is done its job,destroy it to vacate space for a new
+      //spawn,the limit might increase in future
+      file.destory();
 }).find("..").find("..");
 
 console.log(tree.__tree__);

@@ -1,0 +1,34 @@
+{
+	"name": "filetree",
+	
+   "version":"0.0.1",
+   
+   "main":"./filetree.js",
+
+	"description": "simple,lightweight concatenation script",
+	
+	"engine":{
+		"node":">= 0.4.0"
+	},
+	
+	"keyword":["filesystem","navigator","filesystem navigation script"],
+	
+	"owners":{
+		"name":"Alex Ewetumo",
+		"email":"trinoxf@gmail.com"
+	},
+	
+	"licenses":{
+		"type":"MIT",
+      		"url": "http://mths.be/mit"
+	},
+	
+	"repository":{
+		"type":"git",
+		"url":"https://github.com/influx6/FileTree.js.git"
+	},
+	
+	"Dependencies":{
+		"stub" : ">= 0.3.1"
+	}
+}
