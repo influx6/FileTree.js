@@ -17,4 +17,9 @@
 		
 		Simple,Straight,no repetition,no hassle.
 		
+#Dependencies:
+	- Nodejs 0.4 and higher
+	- Stub: Lightweight Class Library(already included in the node_modules folder)
+	
+	
 #A simple world is a happier one.
