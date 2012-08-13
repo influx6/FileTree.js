@@ -11,19 +11,18 @@
    able to retrieve specific files according to a specific criteria or name.
 
    In Vanilla Node FS module:
+
       var project = "/Users/PunchBox/Projects";
       var stub_project  = project + "/stub_project";
       var filetree_project = project + "filetree";
 
-      to read specific files in this directory you must 
+      fs.readFile(stub_project+"/stub.js",function(err,data){
+          //do something with the data;
+       });
 
-         fs.readFile(stub_project+"/stub.js",function(err,data){
+      fs.readFile(filetree_project+"/filetree.js",function(err,data){
             //do something with the data;
-         });
-
-         fs.readFile(filetree_project+"/filetree.js",function(err,data){
-            //do something with the data;
-         });
+       });
 
    In FileTree: Its simple a method call chain
 
