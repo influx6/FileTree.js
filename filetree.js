@@ -49,7 +49,7 @@ var fs = require('fs'),
          var createSpawn = function(data){
             var find;
             if(spawns.length <= max_spawn){
-                find = { load: data, isAlive:true, id: spawns.length };
+                find = { __data__:{}, load: data, isAlive:true, id: spawns.length };
                 _su.pusher(spawns,find); 
                 return find;
             }else{
@@ -69,6 +69,7 @@ var fs = require('fs'),
          },
          FileUtils = {
             
+
             stats: function(){
                var map = {}; 
                _su.onEach(this.load,function(e,i,b){
@@ -81,27 +82,37 @@ var fs = require('fs'),
             },
 
             read: function(){
-               var data = [];
+               _su.explode(this.__data__);
+
+               var data = this.__data__;
                _su.onEach(this.load,function(e,i,b){
-                     data.push(fs.readFileSync(e).toString());
+                     fs.readFile(e,function(err,d){
+                           data[i] = d.toString();
+                     });
                },this);
+               
                return data;
             },
 
-            write: function(data,name){
+            write: function(isAppend,data,name,fn){
+               var handle = fs.writeFile;
+               if(isAppend) handle = fs.appendFile;
+
+               if(name){
+                  handle(this.load[name],data,fn);
+                  return;
+               }
+
                _su.onEach(this.load,function(e,i,b){
-                     if(name && i === name){
-                        fs.appendFileSync(e,data);
-                        return;
-                     }
-                     fs.appendFileSync(e,data);
-                     return;
+                     handle(e,data,fn);
                },this);
-   
+
+               return;
             },
 
             destroy: function(){
                 _su.explode(this.load);
+                _su.explode(this.__data__);
                 this.isAlive = false;
             }
 
@@ -115,7 +126,7 @@ var fs = require('fs'),
                   return Shell;
                }
             },
-            cache: spawns
+            cache: spawns,
          }
     })(),
 
@@ -223,11 +234,22 @@ var fs = require('fs'),
                },this);
    
                if(!fn){ 
-                  return new FileFactory.spawn(find);
+                  return FileFactory.spawn(find);
                };
 
                fn.call(this,find);
                return this;
+            },
+
+            currentPath: function(){
+                 return this.fetchHistory(this.currentHistory);
+            },
+
+            createFile: function(name,data){
+                var current = this.currentPath();
+                fs.writeFile(_g.resolvePath(current,name), data || ""); 
+                this.root(current);
+                return this;
             },
 
             find: function(path){
