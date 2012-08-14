@@ -35,6 +35,8 @@ var fs = require('fs'),
             },this);
 
             binds[".."] = this.resolvePath(_currentPath,"..");
+            binds["."] = this.resolvePath(_currentPath,".");
+
             return binds;
          }
        }
@@ -234,7 +236,7 @@ var fs = require('fs'),
                },this);
    
                if(!fn){ 
-                  return FileFactory.spawn(find);
+                  return find;
                };
 
                fn.call(this,find);

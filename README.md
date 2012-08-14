@@ -35,7 +35,10 @@
       The currrent path can be attained throught: fileTree.currentPath();
 
 
-      var stub = fileTree.searchFiles("stub.js").read()["stub.js"];
+      var stub = FileFactory.spawn(fileTree.searchFiles("stub.js")).read()["stub.js"];
+
+      You can use FileFactory to generate a file object that as a small set
+      of abilities like read or write
       
       fileTree.backward().find("filetree").searchFiles("filetree.js",function(res){
           //res will be an object containing mappings of filename: filename path
@@ -46,13 +49,16 @@
             - a name,
             - file extension,
             - an option callback that gets the results as its first argument,
-         it returns a FileFactory object which lets you read,write minimally
-         to the set of results or a specific file in the result in the case of writing 
+          searchFiles will return a object with the results of the search in a
+          filename:filepath fashion,its left to you to decide on how you wish
+          to use the object created,you can use FileFactory as above or pass
+          a callback to searchFiles which restores the chaining ability and has
+          the results as its first arguments as above
 
-         "read" returns a object with a mapping of filename: data format,therefore
+         FileFactory "read" returns a object with a mapping of filename: data format,therefore
          you can access stub.js data simply by appending the name to the result
 
-         "write" accepts 
+         FileFactory "write" accepts 
             - a boolean TRUE/FALSE argument to indicate appending or rewritting of the file,
             - data to write to the file in ,
             - a name to write to a specific file in the result from searchFiles,
@@ -60,8 +66,19 @@
 
       Another is writing to a large set of files meeting a criteria in searchFiles,where 
       you are not bothered about which file is to written to:
-      FileTree.root("/").find("Library").find("Logs").searchFiles(null,".log").write(true,"new words onto all logs");
 
+      var file = FileFactory.spawn(FileTree.root("/").find("Library").find("Logs").searchFiles(null,".log"))
+      file.write(true,"new words onto all logs");
+
+      FileFactory has a limit of 10 spawns as of now,it might increase as times
+      goes on or if you wish to be much of a hacker you can increase it as you
+      wish but it is not adviced,this was put inplace for performance
+      reason,theres never a good idea in mindlessly creating new Objects.
+      FileFactory only asks that once you are done with the spawns that you
+      call their "destroy" method to release that object for instant reuse once
+      you spawn once again 
+
+      file.destroy() //frees this spawn for immediate use
 #Dependencies:
 	- Nodejs 0.4 and higher
 	- Stub: Lightweight Class Library(already included in the node_modules folder)
