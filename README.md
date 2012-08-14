@@ -1,6 +1,9 @@
 #FileTree.js
 	Easy navigation through your filesystem,released for public use no restrictions
-	
+
+#Install
+		npm install filetree
+		
 #Why FileTree
    The usual course of action when trying to get a file usual evolves copy and
    pasting the paths or looking for a specific file or set of files in

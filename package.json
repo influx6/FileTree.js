@@ -7,10 +7,6 @@
 
 	"description": "simple,lightweight concatenation script",
 	
-	"engine":{
-		"node":">= 0.4.0"
-	},
-	
 	"keyword":["filesystem","navigator","filesystem navigation script"],
 	
 	"owners":{
@@ -28,7 +24,12 @@
 		"url":"https://github.com/influx6/FileTree.js.git"
 	},
 	
-	"Dependencies":{
-		"stub" : ">= 0.3.1"
+	"dependencies": {
+	        "stub": ">= 0.3.0"
+	 },
+	
+	"engine":{
+		"node":">= 0.4.0"
 	}
+	
 }
