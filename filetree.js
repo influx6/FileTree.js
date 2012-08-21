@@ -9,7 +9,9 @@ var fs = require('fs'),
     _g = {
 
        isHomeDir: function(symbol){
-          if(symbol == "~" || symbol == "HOME_DIR" || symbol == "HOME_DIR".toLowerCase()) return process.env["HOME"];
+          symbol = symbol.toUpperCase();
+          if(symbol === "~" || symbol === "HOME_DIR" || symbol === "HOME_DIR") return process.env["HOME"];
+          if(symbol === "." || symbol === "CURRENT"   || symbol === "CURRENT_DIR") return this.resolvePath(".");
           return symbol;
        },
 
