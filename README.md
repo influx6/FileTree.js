@@ -55,7 +55,7 @@
           a callback to searchFiles which restores the chaining ability and has
           the results as its first arguments as above
 
-         FileFactory "read" returns a object with a mapping of filename: data format,therefore
+         FileFactory "read" returns a object with a mapping of filename:data format,therefore
          you can access stub.js data simply by appending the name to the result
 
          FileFactory "write" accepts 
@@ -70,7 +70,7 @@
       var file = FileFactory.spawn(FileTree.root("/").find("Library").find("Logs").searchFiles(null,".log"))
       file.write(true,"new words onto all logs");
 
-      FileFactory has a limit of 10 spawns as of now,it might increase as times
+      FileFactory has a limit of 10 spawns as of now,it might increase as time
       goes on or if you wish to be much of a hacker you can increase it as you
       wish but it is not adviced,this was put inplace for performance
       reason,theres never a good idea in mindlessly creating new Objects.
@@ -79,9 +79,6 @@
       you spawn once again 
 
       file.destroy() //frees this spawn for immediate use
-#Dependencies:
-	- Nodejs 0.4 and higher
-	- Stub: Lightweight Class Library(already included in the node_modules folder)
-	
+
 	
 #A simple world is a happier one.

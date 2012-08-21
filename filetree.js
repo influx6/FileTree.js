@@ -2,6 +2,8 @@ var fs = require('fs'),
     path = require("path"),
     util = require("util"),
     stub = require("stub").Stubs,
+    _stat = fs.stat,
+    _statSync = fs.statSync,
     _su = stub.SU,
     _currentPath,
     _g = {
@@ -45,12 +47,11 @@ var fs = require('fs'),
     //spawns a shell which is proxied with the functions from FileUtils
     FileFactory = (function(){
    
-         var spawns = {}; spawns.length = 0;
-         var max_spawn = 10;
+         var spawns = {}; spawns.length = 0; spawns.max = 10;
 
          var createSpawn = function(data){
             var find;
-            if(spawns.length <= max_spawn){
+            if(spawns.length <= spawns.max){
                 find = { __data__:{}, load: data, isAlive:true, id: spawns.length };
                 _su.pusher(spawns,find); 
                 return find;
@@ -75,7 +76,7 @@ var fs = require('fs'),
             stats: function(){
                var map = {}; 
                _su.onEach(this.load,function(e,i,b){
-                    fs.stat(e,function(err,s){
+                    _stat(e,function(err,s){
                         map[i] = s;
                    });
                },this);
@@ -214,11 +215,11 @@ var fs = require('fs'),
                return this;
             },
 
-         /*searchFiles will only look for non-directory files,it returns an array of
+         /*Files will only look for non-directory files,it returns an array of
           * the location of files that the extension or the file the filename
           * giving
          */
-            searchFiles: function(name,extension,fn){
+         files: function(name,extension,fn){
                if(!name && !extension) return;
                
                var ext = _su.isRegExp(extension) ? extension : RegExp("\\"+extension+"$");
@@ -243,10 +244,21 @@ var fs = require('fs'),
                return this;
             },
 
+            //returns the current directory which you are located in
             currentPath: function(){
                  return this.fetchHistory(this.currentHistory);
             },
 
+            //create a directory
+            createDir: function(name,mode,fn){
+               if(!fn) fn = function(err){ throw err; }
+
+               var current = this.currentPath();
+               fs.mkdir(_g.resolvePath(current,name),mode || 0777,fn);
+               return this;
+            },
+
+            //create a file
             createFile: function(name,data){
                 var current = this.currentPath();
                 fs.writeFile(_g.resolvePath(current,name), data || ""); 
@@ -254,16 +266,54 @@ var fs = require('fs'),
                 return this;
             },
 
-            find: function(path){
-                 var keys = _su.keys(this.__tree__);
-                 if(keys.lengths == 0 || !_su.contains(keys,path)){
-                     console.error("Location not Found!"); return this;
-                 }
+            //move thinds down here for better structure,basic dir and
+            //dirs engine
+            _findRoutine: function(path){
                  var k = this.__tree__[path];
+
+                 //if path is not found,just return dont do a thing;
+                 if(!k) return;
+                 if(!_statSync(k).isDirectory()) return;
+
                  this.__tree__  = this._elevateDir(k);
                  this._updateHistory(path,k);
-
                  return this;
+            },
+
+            //only to be used to move around directories,to get a file,use searchFiles
+            //{params path} the name of the folder/directory you wish to move
+            //to next
+            //{params shouldCreate} a boolean value,indicating if should create
+            //the directory if its not found or throw an error,should be set to
+            //TRUE if you wish to create it when not found
+            dir: function(path,shouldCreate){
+                 var keys = _su.keys(this.__tree__);
+				
+                 if(keys.length <= 0) retun;
+                 if(!_su.contains(keys,path)){
+                    if(!shouldCreate){
+                     throw new Error("Location not found in current Tree/Directory("+
+                           this.currentPath()+"): "+ path);
+                     return;
+                    }
+                   this.createDir(path,null,function(err){
+                        self._findRoutine(path);
+                    });
+                     return this;
+                 }
+
+                 this._findRoutine(path);
+                 return this;
+            },
+
+            dirs: function(path,shouldCreate){
+               if(!_su.isString(path) && !path.match(/[\w-_\s]+/)) return;
+               var paths = path.split(/\s/);
+               _su.onEach(paths,function(e,i){
+                  this.find(e,shouldCreate);
+                  return;
+               },this);
+               return;
             },
 
             fetchHistory: function(path){
@@ -290,9 +340,7 @@ var fs = require('fs'),
     })();
 
 
-module.exports.Tree = {
+module.exports = {
    FileTree: FileTree,
    FileFactory: FileFactory
 };
-
-//for debugging purposes
