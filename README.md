@@ -30,7 +30,7 @@
    In FileTree: Its simple a method call chain
 
       var fileTree = Tree.FileTree.init(~);
-      fileTree.find("Project").find("stub");
+      fileTree.dir("Project").find("stub");
 
       The currrent path can be attained throught: fileTree.currentPath();
 
@@ -40,12 +40,18 @@
       You can use FileFactory to generate a file object that as a small set
       of abilities like read or write
       
-      fileTree.backward().find("filetree").searchFiles("filetree.js",function(res){
+      fileTree.backward().dir("filetree").files("filetree.js",function(res){
           //res will be an object containing mappings of filename: filename path
           console.log(res);
       });
 
-         "searchFiles" accepts 
+	 you can also do a multimove into a directory by calling dirs instead of dir:
+	  fileTree.root("~").dirs("Projects petprojects filetree").files()
+	 as you may notice,there are no forward or backward slashes,the space is the delimiter,
+	 you space the directory you wish to jump into in the order you want to run to,remember
+	 the next directory must be in the previous directory
+
+         "files" accepts 
             - a name,
             - file extension,
             - an option callback that gets the results as its first argument,
@@ -67,7 +73,7 @@
       Another is writing to a large set of files meeting a criteria in searchFiles,where 
       you are not bothered about which file is to written to:
 
-      var file = FileFactory.spawn(FileTree.root("/").find("Library").find("Logs").searchFiles(null,".log"))
+      var file = FileFactory.spawn(FileTree.root("/").dir("Library").dir("Logs").files(null,".log"))
       file.write(true,"new words onto all logs");
 
       FileFactory has a limit of 10 spawns as of now,it might increase as time

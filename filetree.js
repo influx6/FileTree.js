@@ -253,18 +253,26 @@ var fs = require('fs'),
 
             //create a directory
             createDir: function(name,mode,fn){
-               if(!fn) fn = function(err){ throw err; }
-
-               var current = this.currentPath();
-               fs.mkdir(_g.resolvePath(current,name),mode || 0777,fn);
+               var dir = _g.resolvePath(this.currentPath(),name);
+               
+               fs.exists(dir,function(is){
+                  if(!is){
+                      fs.mkdir(dir,mode || 0777, fn || function(e){
+                           if(e) throw e;
+                      });
+                  }
+               });
+       
                return this;
             },
 
             //create a file
             createFile: function(name,data){
-                var current = this.currentPath();
-                fs.writeFile(_g.resolvePath(current,name), data || ""); 
-                this.root(current);
+                var self = this,current = this.currentPath();
+                fs.writeFile(_g.resolvePath(current,name), data || "","utf8",function(e){
+                     if(e) throw e;
+                     self.root(current);
+                }); 
                 return this;
             },
 
