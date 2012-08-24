@@ -253,17 +253,14 @@ var fs = require('fs'),
 
             //create a directory
             createDir: function(name,mode,fn){
-               var dir = _g.resolvePath(this.currentPath(),name);
+               var self = this,dir = _g.resolvePath(this.currentPath(),name);
                
-               fs.exists(dir,function(is){
-                  if(!is){
-                      fs.mkdir(dir,mode || 0777, fn || function(e){
-                           if(e) throw e;
-                      });
-                  }
-               });
-       
-               return this;
+               if(!fs.existsSync(dir)){
+                  fs.mkdirSync(dir,mode || 0777);
+                  this.root(this.currentPath());
+                  return this;
+               }
+                return this;
             },
 
             //create a file
@@ -297,7 +294,7 @@ var fs = require('fs'),
             //the directory if its not found or throw an error,should be set to
             //TRUE if you wish to create it when not found
             dir: function(path,shouldCreate){
-                 var keys = _su.keys(this.__tree__);
+                 var self = this,keys = _su.keys(this.__tree__);
 				
                  if(keys.length <= 0) retun;
                  if(!_su.contains(keys,path)){
@@ -306,10 +303,9 @@ var fs = require('fs'),
                            this.currentPath()+"): "+ path);
                      return;
                     }
-                   this.createDir(path,null,function(err){
-                        self._findRoutine(path);
-                    });
-                     return this;
+                    this.createDir(path,null);
+                    this.dir(path);
+                    return this;
                  }
 
                  this._findRoutine(path);
