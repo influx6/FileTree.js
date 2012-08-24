@@ -9,9 +9,8 @@ var fs = require('fs'),
     _g = {
 
        isHomeDir: function(symbol){
-          symbol = symbol.toUpperCase();
           if(symbol === "~" || symbol === "HOME_DIR" || symbol === "HOME_DIR") return process.env["HOME"];
-          if(symbol === "." || symbol === "CURRENT"   || symbol === "CURRENT_DIR") return this.resolvePath(".");
+          if(symbol === "." || symbol.toUpperCase() === "CURRENT"   || symbol.toUpperCase() === "CURRENT_DIR") return this.resolvePath(".");
           return symbol;
        },
 
@@ -167,11 +166,15 @@ var fs = require('fs'),
                return this;
             },
 
-            root: function(path){
+            root: function(path,dntUpdate){
                var p = _g.isHomeDir(path);
-               this.__tree__ = this._elevateDir(p);
-               this.emit("history:change",path,p);
+               this._updateTree(p);
+               if(!dntUpdate) this.emit("history:change",path,p);
                return this;
+            },
+
+            _updateTree: function(p){
+               this.__tree__ = this._elevateDir(p);
             },
 
             _probHistory: function(n){
@@ -192,17 +195,29 @@ var fs = require('fs'),
                return this;
             },
 
+            _handleTimeCall: function(time){
+               var path = this.fetchHistory(time);
+               if(path) this.root(path,true);
+               return;
+            },
+
             _handleTime: function(times){
+               if(_su.isString(times)){
+               }
                var cid = _su.keys(this.__history__).indexOf(this.currentHistory),
                move = this._probHistory(cid+times);
       
                var test = this.fetchHistory(move);
-               this.tree = this._elevateDir(this.fetchHistory(move));
+               this._updateTree(this.fetchHistory(move));
                this.currentHistory = move;
             },
 
             forward: function(times){
                if((this.currentHistory == this._probHistory("last")) && !_su.isNumber(times)) return;
+
+               if(_su.isString(times)){
+                  this._handleTimeCall(times);
+               }
 
                if(!times){ times = 1};
                this._handleTime(times);
@@ -211,6 +226,10 @@ var fs = require('fs'),
             
             backward: function(times){
                if((this.currentHistory == this._probHistory("first")) && !_su.isNumber(times)) return;
+               
+               if(_su.isString(times)){
+                  this._handleTimeCall(times);
+               }
 
                if(!times) times = 1;
                this._handleTime(-times);
@@ -257,7 +276,7 @@ var fs = require('fs'),
                
                if(!fs.existsSync(dir)){
                   fs.mkdirSync(dir,mode || 0777);
-                  this.root(this.currentPath());
+                  this._updateTree(this.currentPath());
                   return this;
                }
                 return this;
@@ -304,7 +323,7 @@ var fs = require('fs'),
                      return;
                     }
                     this.createDir(path,null);
-                    this.dir(path);
+                    this._findRoutine(path);
                     return this;
                  }
 
@@ -316,7 +335,7 @@ var fs = require('fs'),
                if(!_su.isString(path) && !path.match(/[\w-_\s]+/)) return;
                var paths = path.split(/\s/);
                _su.onEach(paths,function(e,i){
-                  this.find(e,shouldCreate);
+                  this.dir(e,shouldCreate);
                   return;
                },this);
                return;

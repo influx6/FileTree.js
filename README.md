@@ -5,86 +5,95 @@
 		npm install filetree
 		
 #Why FileTree
-   The usual course of action when trying to get a file usual evolves copy and
-   pasting the paths or looking for a specific file or set of files in
-   a specific location which usually involve abit of redundant work,filetree
-   was created out of my desire to have an easy,fast way to get to different
-   locations within the filesystem and be able to backtrack to them when
-   without having to keep this paths within a specific variable and also to be
-   able to retrieve specific files according to a specific criteria or name.
+   FileTree was my creation to deal with manual typing of file paths or
+   manaully creating directory structure,it was about saving time and reducing
+   the amount of work done when dealing with files and directories.
 
-   In Vanilla Node FS module:
+#Methods Explanation
+   
+   ###FileTree:init: 
+         to be called when initializing the filetree object
+   ###FileTree:dir: 
+         to move to a single directory located within the current directory
+   ###FileTree:dirs:
+         allows you to move onto multiple directory location at once by spacing
+         the name of the directory in quotes eg. "Project petproject redistribute",this will move
+         from Project to petproject to redistribute.
+   ###FileTree:forward:
+         takes a number(on how long to move forward to the history) or a string(where to move to by a specific
+         name of a directory formerly visited)
+   ###FileTree:backward:
+         takes a number or string like the forward method but moves backward
+         through the history
+   ###FileTree:root:
+         this methods lets you relocat the tree to a starting location like the
+         init method
+   ###FileTree:useTree:
+         this method allows you to pass a function that lets you access the
+         tree of the filetree object,incase you wish to do certain things with
+         the raw paths
+   ###FileTree:flush:
+         this method lets you destroy the whole tree and history,so you can
+         start with a clean slate
+   ###FileTree:files: 
+         formerly searchFiles,this method is used to locate files within the
+         current location,you can pass a name as first argument and also pass
+         a extension for a filetype you wish to be specific,also as a third
+         argument you can pass a function that allows you to access the raw
+         paths of the results of this method,eg:
+         ``` files("stub.js"); or files(null,"js"); or files("stub","js"); 
+         ```
+         the files method returns a FileFactory object if you dont pass a function
+         as the third arguments of this method.
 
-      var project = "/Users/PunchBox/Projects";
-      var stub_project  = project + "/stub_project";
-      var filetree_project = project + "filetree";
+   ###FileTree:currentPath:
+         this method allows you to access the current path of which the tree is
+         located in 
 
-      fs.readFile(stub_project+"/stub.js",function(err,data){
-          //do something with the data;
-       });
+   ###FileTree:createDir:
+         this method allows you to create a directory within the current
+         location of the tree 
 
-      fs.readFile(filetree_project+"/filetree.js",function(err,data){
-            //do something with the data;
-       });
+   ###FileTree:createFile:
+         this method allows you to create a file within the current location of
+         the Tree
 
+   ###FileTree:fetchHistory:
+         this allows you to get a specific location in the history,but requires
+         you to know the name of the path you wish to get from the fetchHistory
+
+   ###FileFactory
+         this is a method which lets you do simple operations like read,write,stats with the result from the
+         FileTree:files method,it lets you do simple operations especially when it comes to batch files.
+
+   ###FileFactory:spawn
+         this method must be called when using the FileFactory object,now it the limit of the spawn function
+         call is set to 10 to ensure not to much FileFactory object are created but it can be increased
+         by setting the FileFactory.cache to a higher number.
+
+   ###FileFactory:cache
+         this lets you set the total amount of allowable spawns by the FileFactory.spawn method
+
+
+#Examples
    In FileTree: Its simple a method call chain
 
+      ```
       var fileTree = Tree.FileTree.init(~);
       fileTree.dir("Project").find("stub");
 
-      The currrent path can be attained throught: fileTree.currentPath();
-
-
       var stub = FileFactory.spawn(fileTree.searchFiles("stub.js")).read()["stub.js"];
 
-      You can use FileFactory to generate a file object that as a small set
-      of abilities like read or write
-      
       fileTree.backward().dir("filetree").files("filetree.js",function(res){
           //res will be an object containing mappings of filename: filename path
           console.log(res);
       });
 
-	 you can also do a multimove into a directory by calling dirs instead of dir:
-	  fileTree.root("~").dirs("Projects petprojects filetree").files()
-	 as you may notice,there are no forward or backward slashes,the space is the delimiter,
-	 you space the directory you wish to jump into in the order you want to run to,remember
-	 the next directory must be in the previous directory
-
-         "files" accepts 
-            - a name,
-            - file extension,
-            - an option callback that gets the results as its first argument,
-          searchFiles will return a object with the results of the search in a
-          filename:filepath fashion,its left to you to decide on how you wish
-          to use the object created,you can use FileFactory as above or pass
-          a callback to searchFiles which restores the chaining ability and has
-          the results as its first arguments as above
-
-         FileFactory "read" returns a object with a mapping of filename:data format,therefore
-         you can access stub.js data simply by appending the name to the result
-
-         FileFactory "write" accepts 
-            - a boolean TRUE/FALSE argument to indicate appending or rewritting of the file,
-            - data to write to the file in ,
-            - a name to write to a specific file in the result from searchFiles,
-            - a callback to pass as to callback to the fs module asyn writeFile method
-
-      Another is writing to a large set of files meeting a criteria in searchFiles,where 
-      you are not bothered about which file is to written to:
-
       var file = FileFactory.spawn(FileTree.root("/").dir("Library").dir("Logs").files(null,".log"))
       file.write(true,"new words onto all logs");
 
-      FileFactory has a limit of 10 spawns as of now,it might increase as time
-      goes on or if you wish to be much of a hacker you can increase it as you
-      wish but it is not adviced,this was put inplace for performance
-      reason,theres never a good idea in mindlessly creating new Objects.
-      FileFactory only asks that once you are done with the spawns that you
-      call their "destroy" method to release that object for instant reuse once
-      you spawn once again 
-
       file.destroy() //frees this spawn for immediate use
 
+      ```
 	
 #A simple world is a happier one.
