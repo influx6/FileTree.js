@@ -89,6 +89,8 @@
           console.log(res);
       });
 
+      fileTree.dir("tests",true).dir("unit",true).backward().dir("functional",true);
+      
       var file = FileFactory.spawn(FileTree.root("/").dir("Library").dir("Logs").files(null,".log"))
       file.write(true,"new words onto all logs");
 
