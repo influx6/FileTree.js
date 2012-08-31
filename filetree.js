@@ -240,7 +240,7 @@ var fs = require('fs'),
           * the location of files that the extension or the file the filename
           * giving
          */
-         files: function(name,extension,fn){
+         files: function(name,extension){
                if(!name && !extension) return;
                
                var ext = _su.isRegExp(extension) ? extension : RegExp("\\"+extension+"$");
@@ -257,12 +257,7 @@ var fs = require('fs'),
                    }catch(e){};
                },this);
    
-               if(!fn){ 
-                  return find;
-               };
-
-               fn.call(this,find);
-               return this;
+               return find;
             },
 
             //returns the current directory which you are located in
@@ -338,7 +333,7 @@ var fs = require('fs'),
                   this.dir(e,shouldCreate);
                   return;
                },this);
-               return;
+               return this;
             },
 
             fetchHistory: function(path){
